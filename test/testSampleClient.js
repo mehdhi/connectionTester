@@ -1,4 +1,5 @@
 var Connection = require('./connection');
+var MessageFactory = require('./message-factory');
 var should = require('should');
 
 describe("Atmosphere Neutrino Connection Testing", function() {
@@ -27,6 +28,7 @@ describe("Atmosphere Neutrino Connection Testing", function() {
             //Assertions
             console.log( "Data recieved for Testing : " + JSON.stringify(data));
             data.ver.should.equal(1.0);
+            MessageFactory.getConnInitMessaeg();
             done();
         }).catch(function(err) {
             console.log( "Error Occured during testing: " + err);

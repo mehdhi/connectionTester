@@ -2,22 +2,9 @@ module.exports.connect = function Connection(serverUrl, done) {
 
     var socket = require('atmosphere.js');
     var Promise = require('es6-promise').Promise;
+    var MessageManager = require('./message-manager');
     var request;
     var sub;
-    var resolveMessage;
-    var rejectMessage;
-    
-    /**
-     * This holds the Promsie for message recieved 
-     */
-    var onMessagePromise;
-    
-    
-    onMessagePromise = new Promise(
-        function(resolve, reject) {
-            resolveMessage = resolve;
-            rejectMessage = reject;
-        });
 
     request = {
         url: serverUrl,
@@ -27,16 +14,24 @@ module.exports.connect = function Connection(serverUrl, done) {
     };
 
     request.onMessage = function(response) {
-        console.log("Message recieved from server : " + response.responseBody);
+        
         try {
             var message = JSON.parse(response.responseBody);
             if (message != null) {
-                resolveMessage(message);
-            } else {
-                rejectMessage("Recieved Message is null!");
+                //TODO Find error message
+                var errorCondition = false;
+                if ( !errorCondition ){
+                    MessageManager.resolveMessage(message);
+                } else {
+                    MessageManager.rejectMessage(message);
+                }   
+                
+            } else {                
+                console.error("Message recieved from server is null or corrupted: " + response.responseBody);
             }
         } catch (error) {
-            rejectMessage(error);
+            console.error("Message recieved cannot be parsed. Error : " + error 
+            + "\n MessageBody : " + response.responseBody );
         }
     };
 
@@ -55,16 +50,18 @@ module.exports.connect = function Connection(serverUrl, done) {
      * Send Message on Active connection
      */
     function sendMessage(msg) {
+        
         if (sub != null) {
             if (typeof msg == 'string') {
                 sub.push(msg);
-                console.log("Message sent!");
+                console.log("Message sent! Message ID not found cannot return a promise.");
             } else {
                 try {
                     var strJson = JSON.stringify(msg);
                     if (strJson != null) {
                         sub.push(strJson);
                         console.log("Message sent!");
+                        return MessageManager.addToList(msg.messageId);
                     } else {
                         console.log("Sending failed! Message is null");
                     }
@@ -76,14 +73,13 @@ module.exports.connect = function Connection(serverUrl, done) {
         } else {
             console.log("Sending failed! Connection is not active!");
         }
-
+        return null;
     }
 
     return {
 
         send: function(msg) {
-            sendMessage(msg);
-            return onMessagePromise;
+            return sendMessage(msg);
         }
 
     }
