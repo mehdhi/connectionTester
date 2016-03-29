@@ -73,6 +73,7 @@ module.exports.connect = function Connection(serverUrl, done) {
         } else {
             console.log("Sending failed! Connection is not active!");
         }
+        console.log("null last");
         return null;
     }
 

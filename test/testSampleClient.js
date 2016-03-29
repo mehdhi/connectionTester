@@ -6,7 +6,7 @@ describe("Atmosphere Neutrino Connection Testing", function() {
     var conn;
     
     before( function( done ) {
-        conn = Connection.connect('http://localhost:8400/jupiter/neutrino',done);
+        conn = Connection.connect('http://echo.websocket.org',done);
     });
 
 
@@ -14,6 +14,7 @@ describe("Atmosphere Neutrino Connection Testing", function() {
         conn.send(
             
             {
+                messageId: 12515,
                 ver: 1,
                 type: 'conn',
                 msg: 'init',
@@ -23,7 +24,7 @@ describe("Atmosphere Neutrino Connection Testing", function() {
                 os: 'iOS8.1',
                 app: 'electron',
                 brow: 'safari 6'
-            }, done
+            }
         ).then(function(data) {
             //Assertions
             console.log( "Data recieved for Testing : " + JSON.stringify(data));
