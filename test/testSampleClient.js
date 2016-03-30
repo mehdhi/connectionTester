@@ -1,20 +1,21 @@
 var Connection = require('./connection');
-var MessageFactory = require('./message-factory');
 var should = require('should');
 
 describe("Atmosphere Neutrino Connection Testing", function() {
     var conn;
     
     before( function( done ) {
-        conn = Connection.connect('http://echo.websocket.org',done);
+        conn = Connection.connect('http://localhost:8400/jupiter/neutrino',done);
+        // conn = Connection.connect('ws://echo.websocket.org',done);
     });
 
 
     it('Should send and recieve from Neutrino', function(done) {
+        this.timeout(5000);
         conn.send(
             
             {
-                messageId: 12515,
+                id: 12515,
                 ver: 1,
                 type: 'conn',
                 msg: 'init',
@@ -29,7 +30,7 @@ describe("Atmosphere Neutrino Connection Testing", function() {
             //Assertions
             console.log( "Data recieved for Testing : " + JSON.stringify(data));
             data.ver.should.equal(1.0);
-            MessageFactory.getConnInitMessaeg();
+           
             done();
         }).catch(function(err) {
             console.log( "Error Occured during testing: " + err);

@@ -1,8 +1,8 @@
 module.exports.connect = function Connection(serverUrl, done) {
 
     var socket = require('atmosphere.js');
-    var Promise = require('es6-promise').Promise;
     var MessageManager = require('./message-manager');
+    var Promise = require('es6-promise').Promise;
     var request;
     var sub;
 
@@ -54,27 +54,26 @@ module.exports.connect = function Connection(serverUrl, done) {
         if (sub != null) {
             if (typeof msg == 'string') {
                 sub.push(msg);
-                console.log("Message sent! Message ID not found cannot return a promise.");
+                console.warn("Message is string!");
             } else {
                 try {
                     var strJson = JSON.stringify(msg);
                     if (strJson != null) {
                         sub.push(strJson);
-                        console.log("Message sent!");
-                        return MessageManager.addToList(msg.messageId);
+                        console.info("Message sent!");
+                        return MessageManager.addToList(msg);
                     } else {
-                        console.log("Sending failed! Message is null");
+                        console.warn("Sending failed! Message is null");
                     }
                 } catch (error) {
-                    console.log("Sending failed! Error : " + error);
+                    console.warn("Sending failed! " + error);
                 }
 
             }
         } else {
-            console.log("Sending failed! Connection is not active!");
+            console.error("Sending failed! Connection is not active!");
         }
-        console.log("null last");
-        return null;
+        return new Promise.reject("Error : Message not tracked.");
     }
 
     return {
